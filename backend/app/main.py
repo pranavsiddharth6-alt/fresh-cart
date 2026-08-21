@@ -16,13 +16,26 @@ app = FastAPI(
     description="Beginner-friendly Supermarket E-commerce backend using FastAPI and Supabase"
 )
 
-# Configure Cross-Origin Resource Sharing (CORS)
+# Configure Cross-Origin Resource Sharing (CORS) as the first middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.ALLOWED_ORIGINS,
+    allow_origin_regex=settings.ALLOWED_ORIGIN_REGEX,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD"],
+    allow_headers=[
+        "Content-Type",
+        "Authorization",
+        "Accept",
+        "Origin",
+        "X-Requested-With",
+        "x-user-id",
+        "x-user-email",
+        "apikey",
+        "*"
+    ],
+    expose_headers=["*"],
+    max_age=600,
 )
 
 # Register API Routers under /api
