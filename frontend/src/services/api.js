@@ -1,10 +1,28 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+/**
+ * Centralized API Service for FreshCart Supermarket
+ * Ensures all requests correctly target the '/api' backend prefix.
+ */
+
+// Base URL resolution: auto-ensures '/api' prefix regardless of how VITE_API_URL is supplied
+const rawApiUrl = (
+  import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
+).trim().replace(/\/+$/, '');
+
+// If VITE_API_URL is supplied without '/api' (e.g. 'https://fresh-cart-ns78.onrender.com'), append '/api'
+export const API_BASE_URL = rawApiUrl.endsWith('/api') ? rawApiUrl : `${rawApiUrl}/api`;
 
 /**
- * Generic API fetch helper with error handling
+ * Generic API fetch helper with error handling and auth headers
+ * Guarantees every outbound request goes to ${API_BASE_URL}/...
  */
 async function fetchFromApi(endpoint, options = {}) {
-  const url = `${API_BASE_URL}${endpoint}`;
+  // Normalize endpoint: ensure leading slash and strip duplicate /api if present
+  let cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  if (cleanEndpoint.startsWith('/api/')) {
+    cleanEndpoint = cleanEndpoint.substring(4); // Avoid double /api/api
+  }
+
+  const url = `${API_BASE_URL}${cleanEndpoint}`;
   
   const headers = {
     'Content-Type': 'application/json',
@@ -47,13 +65,16 @@ async function fetchFromApi(endpoint, options = {}) {
 }
 
 export const api = {
-  // Health
+  // Base URL
+  baseUrl: API_BASE_URL,
+
+  // Health -> GET /api/health
   getHealth: () => fetchFromApi('/health'),
 
-  // Categories
+  // Categories -> GET /api/categories
   getCategories: () => fetchFromApi('/categories'),
 
-  // Products
+  // Products -> GET /api/products, GET /api/products/:id
   getProducts: ({ category, search, sortBy } = {}) => {
     const params = new URLSearchParams();
     if (category && category !== 'all') params.append('category', category);
@@ -65,7 +86,7 @@ export const api = {
 
   getProductById: (id) => fetchFromApi(`/products/${id}`),
 
-  // Orders
+  // Orders -> POST /api/orders, GET /api/orders, GET /api/orders/:id
   createOrder: (orderData) => fetchFromApi('/orders', {
     method: 'POST',
     body: JSON.stringify(orderData)
@@ -78,7 +99,7 @@ export const api = {
 
   getOrderById: (id) => fetchFromApi(`/orders/${id}`),
 
-  // Profile
+  // Profile -> GET /api/profile, PUT /api/profile
   getProfile: (userId) => {
     const query = userId ? `?user_id=${encodeURIComponent(userId)}` : '';
     return fetchFromApi(`/profile${query}`);
@@ -92,7 +113,7 @@ export const api = {
     });
   },
 
-  // Admin
+  // Admin -> GET /api/admin/stats, POST /api/products, PUT /api/products/:id, DELETE /api/products/:id, PUT /api/orders/:id/status
   getAdminStats: () => fetchFromApi('/admin/stats'),
 
   createProduct: (productData) => fetchFromApi('/products', {
