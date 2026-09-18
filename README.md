@@ -112,28 +112,4 @@ npm run dev
 
 ---
 
-## 🗄️ Supabase Database & Auth Setup
-
-When you are ready to connect to your live Supabase project:
-
-1. Create a project at [supabase.com](https://supabase.com).
-2. Go to **SQL Editor** in Supabase and paste the contents of [`backend/database/schema.sql`](file:///d:/orginial%20ecommerec/backend/database/schema.sql). Click **Run**.
-3. In Supabase Dashboard, copy your **Project URL** and **anon public key** from *Project Settings > API*.
-4. In `frontend/.env`:
-   ```env
-   VITE_API_URL=http://localhost:8000/api
-   VITE_SUPABASE_URL=https://your-project-id.supabase.co
-   VITE_SUPABASE_ANON_KEY=your-public-anon-key
-   ```
-5. In `backend/.env`:
-   ```env
-   ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173
-   SUPABASE_URL=https://your-project-id.supabase.co
-   SUPABASE_KEY=your-service-role-key-or-anon-key
-   ADMIN_EMAIL=admin@supermarket.com
-   ```
-
-### 🔑 Google OAuth in Supabase (Optional)
-1. In Google Cloud Console, create OAuth 2.0 Client Credentials (Web Application).
-2. Set Authorized Redirect URI to `https://<your-supabase-project-id>.supabase.co/auth/v1/callback`.
-3. In Supabase Dashboard, navigate to **Authentication > Providers > Google**, toggle **Enable Google provider**, and paste your Google Client ID and Secret.
+ ID and Secret.
